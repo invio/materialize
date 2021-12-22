@@ -284,17 +284,22 @@
      */
     _highlight(string, $el) {
       let img = $el.find('img');
-      let matchStart = $el
-          .text()
-          .toLowerCase()
-          .indexOf('' + string.toLowerCase() + ''),
+      // This assumes that $el contains only text.
+      let optionText = $el.text();
+      let matchStart = optionText.toLowerCase().indexOf('' + string.toLowerCase() + ''),
         matchEnd = matchStart + string.length - 1,
-        beforeMatch = $el.text().slice(0, matchStart),
-        matchText = $el.text().slice(matchStart, matchEnd + 1),
-        afterMatch = $el.text().slice(matchEnd + 1);
-      $el.html(
-        `<span>${beforeMatch}<span class='highlight'>${matchText}</span>${afterMatch}</span>`
-      );
+        beforeMatch = optionText.slice(0, matchStart),
+        matchText = optionText.slice(matchStart, matchEnd + 1),
+        afterMatch = optionText.slice(matchEnd + 1);
+      let content = $('<span>').text(beforeMatch);
+      $('<span class="highlight">')
+        .text(matchText)
+        .appendTo(content);
+      let afterMatchEscaped = $('<span>')
+        .text(afterMatch)
+        .html();
+      content.append(afterMatchEscaped);
+      $el.empty().append(content);
       if (img.length) {
         $el.prepend(img);
       }
@@ -381,12 +386,10 @@
         let entry = matchingData[i];
         let $autocompleteOption = $('<li></li>');
         if (!!entry.data) {
-          $autocompleteOption.append(
-            `<img src="${entry.data}" class="right circle"><span>${entry.key}</span>`
-          );
-        } else {
-          $autocompleteOption.append('<span>' + entry.key + '</span>');
+          $autocompleteOption.append($('<img class="right circle">').attr('src', entry.data));
         }
+        // Do not allow HTML in keys, since _highlight would break that anyway.
+        $autocompleteOption.append($('<span>').text(entry.key));
 
         $(this.container).append($autocompleteOption);
         this._highlight(val, $autocompleteOption);

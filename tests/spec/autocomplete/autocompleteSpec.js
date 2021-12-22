@@ -96,6 +96,68 @@ describe("Autocomplete Plugin", function () {
         done();
       }, 200);
     });
+
+    it("should not evaluate escaped javascript in keys", function(done) {
+      window.failed = false;
+      var $normal = $('#normal-autocomplete');
+      $normal.autocomplete({
+        data: {
+          "xss &lt;img src=- onerror=\"(function(){failed=true;})()\" /&gt;": null
+        }
+      });
+
+      $normal.focus();
+      $normal.val('x');
+      keyup($normal[0], 88);
+
+      setTimeout(function() {
+        var $autocompleteEl = $normal.parent().find('.autocomplete-content');
+        expect($autocompleteEl.children().length).toEqual(1, 'Results should show dropdown on text input');
+        expect(window.failed).toBe(false, 'User input executed as JavaScript.');
+        done();
+      }, 200);
+    });
+
+    it("should not evaluate literal javascript in keys", function(done) {
+      window.failed = false;
+      var $normal = $('#normal-autocomplete');
+      $normal.autocomplete({
+        data: {
+          "xss <img src=- onerror=\"(function(){failed=true;})()\" />": null
+        }
+      });
+
+      $normal.focus();
+      $normal.val('x');
+      keyup($normal[0], 88);
+
+      setTimeout(function() {
+        var $autocompleteEl = $normal.parent().find('.autocomplete-content');
+        expect($autocompleteEl.children().length).toEqual(1, 'Results should show dropdown on text input');
+        expect(window.failed).toBe(false, 'User input executed as JavaScript.');
+        done();
+      }, 200);
+    });
+
+    it("It should be possible to match a key with a < sign", function(done) {
+      var $normal = $('#normal-autocomplete');
+      $normal.autocomplete({
+        data: {
+          "escaping <br /> shouldn\'t affect matching": null
+        }
+      });
+
+      $normal.focus();
+      $normal.val('<');
+      keyup($normal[0], 188);
+
+      setTimeout(function() {
+        var $autocompleteEl = $normal.parent().find('.autocomplete-content');
+        expect($autocompleteEl.children().length).toEqual(1, 'Results should show dropdown on text input');
+        expect($autocompleteEl.children().first().text()).toEqual('escaping <br /> shouldn\'t affect matching', 'The option content was not preserved');
+        done();
+      }, 200);
+    });
   });
 
 });
