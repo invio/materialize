@@ -13,7 +13,7 @@
     "url": "git://github.com/invio/materialize.git"
   },
   "bugs": {
-    "url": "https://github.com/Dogfalo/materialize/issues"
+    "url": "https://github.com/invio/materialize/issues"
   },
   "scripts": {
     "dev": "grunt monitor",
