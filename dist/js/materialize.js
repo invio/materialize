@@ -1,5 +1,5 @@
 /*!
- * Materialize v1.0.0 (http://materializecss.com)
+ * Materialize v1.0.1-rc.1 (http://materializecss.com)
  * Copyright 2014-2017 Materialize
  * MIT License (https://raw.githubusercontent.com/Dogfalo/materialize/master/LICENSE)
  */
@@ -6710,12 +6710,18 @@ $jscomp.polyfill = function (e, r, p, m) {
       key: "_highlight",
       value: function _highlight(string, $el) {
         var img = $el.find('img');
-        var matchStart = $el.text().toLowerCase().indexOf('' + string.toLowerCase() + ''),
+        // This assumes that $el contains only text.
+        var optionText = $el.text();
+        var matchStart = optionText.toLowerCase().indexOf('' + string.toLowerCase() + ''),
             matchEnd = matchStart + string.length - 1,
-            beforeMatch = $el.text().slice(0, matchStart),
-            matchText = $el.text().slice(matchStart, matchEnd + 1),
-            afterMatch = $el.text().slice(matchEnd + 1);
-        $el.html("<span>" + beforeMatch + "<span class='highlight'>" + matchText + "</span>" + afterMatch + "</span>");
+            beforeMatch = optionText.slice(0, matchStart),
+            matchText = optionText.slice(matchStart, matchEnd + 1),
+            afterMatch = optionText.slice(matchEnd + 1);
+        var content = $('<span>').text(beforeMatch);
+        $('<span class="highlight">').text(matchText).appendTo(content);
+        var afterMatchEscaped = $('<span>').text(afterMatch).html();
+        content.append(afterMatchEscaped);
+        $el.empty().append(content);
         if (img.length) {
           $el.prepend(img);
         }
@@ -6812,10 +6818,10 @@ $jscomp.polyfill = function (e, r, p, m) {
           var _entry = matchingData[i];
           var $autocompleteOption = $('<li></li>');
           if (!!_entry.data) {
-            $autocompleteOption.append("<img src=\"" + _entry.data + "\" class=\"right circle\"><span>" + _entry.key + "</span>");
-          } else {
-            $autocompleteOption.append('<span>' + _entry.key + '</span>');
+            $autocompleteOption.append($('<img class="right circle">').attr('src', _entry.data));
           }
+          // Do not allow HTML in keys, since _highlight would break that anyway.
+          $autocompleteOption.append($('<span>').text(_entry.key));
 
           $(this.container).append($autocompleteOption);
           this._highlight(val, $autocompleteOption);

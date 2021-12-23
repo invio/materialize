@@ -2,6 +2,15 @@ Changelog
 =======
 Bolded styling surrounded by emojis indicates a breaking change.
 
+## 1.0.1-rc1 (December 22, 2021)
+
+**IMPORTANT** Fixed Moderate and High severity XSS vulnerabilities in th Autocompleted component. Due to the severity of these issues, this is a patch version number increment despite being a breaking change in certain unusual edge cases. See https://github.com/Dogfalo/materialize/issues/6286
+
+- Autocomplete
+  - **Keys are no longer treated as HTML markup**, they are now treated as text.
+  - **Keys are no longer un-escaped if escaped.**
+  - **The image URL in values is now used safely to set the src attribute.**
+
 ## 1.0.0 (September 9th, 2018)
 - [Full Changelog here](https://github.com/Dogfalo/materialize/blob/v1-dev/v1-changelog.md)
 
